@@ -90,12 +90,21 @@ int main()
                 for (i = 0; i < client_arr_size; i++) {
                     if (FD_ISSET(client_fds[i], &readfds)) {
                         read_len = read(client_fds[i], buf, sizeof(buf));
-                        buf[read_len] = '\0';
+                        if (buf[read_len-2] == 13 && buf[read_len-1] == 10) {
+                            buf[read_len-2] = '\0';
+                        } else {
+                            buf[read_len-1] = '\0';
+                        }
                         printf("Read msg from fd %d: %s\n", client_fds[i], buf);
                         if (!strncmp(buf, "/broadcast ", 11)) {
                             for (j = 0; j < client_arr_size; j++) {
                                 sprintf(wr_buf, "User %d:%s broadcast: %s\n", i, clients[i].name, buf+11);
                                 write(client_fds[j], wr_buf, strlen(wr_buf));
+                            }
+                        } else if (!strncmp(buf, "/showusers", 10) && strlen(buf) == 10) {
+                            for (j = 0; j < client_arr_size; j++) {
+                                sprintf(wr_buf, "User %d:%s\n", j, clients[j].name);
+                                write(client_fds[i], wr_buf, strlen(wr_buf));
                             }
                         }
                     }
