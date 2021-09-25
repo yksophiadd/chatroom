@@ -101,6 +101,17 @@ int main()
                                 sprintf(wr_buf, "User %d:%s broadcast: %s\n", i, clients[i].name, buf+11);
                                 write(client_fds[j], wr_buf, strlen(wr_buf));
                             }
+                        } else if (!strncmp(buf, "/msg ", 5)) {
+                            char *tok;
+                            int user_id;
+                            tok = strtok(buf+5, " ");
+                            user_id = atoi(tok);
+                            tok = strtok(NULL, "");
+                            sprintf(wr_buf, "User %d:%s send msg to you:\n", i, clients[i].name);
+                            write(client_fds[user_id], wr_buf, strlen(wr_buf));
+                            write(client_fds[user_id], tok, strlen(tok));
+                            sprintf(wr_buf, "Message already sent to User %d:%s\n", user_id, clients[user_id].name);
+                            write(client_fds[i], wr_buf, strlen(wr_buf));
                         } else if (!strncmp(buf, "/showusers", 10) && strlen(buf) == 10) {
                             for (j = 0; j < client_arr_size; j++) {
                                 sprintf(wr_buf, "User %d:%s\n", j, clients[j].name);
