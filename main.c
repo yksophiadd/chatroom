@@ -106,13 +106,20 @@ int main()
                                 sprintf(wr_buf, "User %d:%s\n", j, clients[j].name);
                                 write(client_fds[i], wr_buf, strlen(wr_buf));
                             }
+                        } else if (!strncmp(buf, "/changename ", 12)) {
+                            char *new_name = strdup(buf+12);
+                            for (j = 0; j < client_arr_size; j++) {
+                                sprintf(wr_buf, "User %d change name from %s to %s\n", i, clients[i].name, new_name);
+                                write(client_fds[j], wr_buf, strlen(wr_buf));
+                            }
+                            free(clients[i].name);
+                            clients[i].name = new_name;
                         }
                     }
                 }
             }
         }
     } while (1);
-    printf("Hello world!\n");
     return 0;
 
 fail:
